@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="https://i.postimg.cc/qvjz8QFW/Logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <title>Nút bấm</title>
+  <link rel="stylesheet" href="./style/style.css">
+</head>
+<body>
+  <img src="https://i.pinimg.com/originals/ed/35/f8/ed35f861be81be2548e514085fb19385.gif" class="Nyan-Cat" id="nyan-cat" alt="Nyan Cat">
+  <img src="./style/cloud.png" alt="Cloud 1" class="floating-cloud-1">
+  <img src="./style/cloud.png" alt="Cloud 2" class="floating-cloud-2">
+  <img src="./style/cloud.png" alt="Cloud 3" class="floating-cloud-3">
+  <div class="key-button" onclick="showRandomMessage(event)">
+    <span>❤️</span>
+  </div>
+  <audio id="popsound">
+    <source src="./style/pop.mp3" type="audio/mpeg" />
+  </audio>
+  <audio id="meosound">
+    <source src="./style/meow.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script src="./style/script.js"></script>
+  <script>
+    // Các lời chúc hiện ngẫu nhiên khi nhấn nút trái tim.
+    const heartMessages = [
+      "Chúc chị 20/10 vui vẻ ❤️",
+      "Chúc bạn học LSD ngày lễ luôn xinh đẹp 🌷",
+      "Chúc chị học tiếng Trung giỏi nhé 📚",
+      "Chị chăm đi học LSD nha 😽",
+      "Chị đi coi phim vui vẻ nha 🍿",
+      "Tối chúc chị ngủ ngon, mơ đẹp nhé 🌙",
+      "Chúc chị Hong Anh luôn zui zẻ, có thật nhiều niềm vui 💗✨"
+    ];
+
+    // Hiệu ứng trái tim bay lên khi nhấn nút.
+    const flyingStyle = document.createElement("style");
+    flyingStyle.textContent = `
+      @keyframes messageFloatIn {
+        0% { opacity: 0; transform: translate(-50%, 22px) scale(.75); }
+        65% { opacity: 1; transform: translate(-50%, -5px) scale(1.04); }
+        100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+      }
+      @keyframes flyUp {
+        0% { opacity: 0; transform: translate(0, 0) rotate(0deg) scale(.7); }
+        15% { opacity: 1; }
+        100% { opacity: 0; transform: translate(var(--drift), -110vh) rotate(var(--spin)) scale(1.35); }
+      }
+      .flying-heart {
+        position: fixed; bottom: -35px; z-index: 10000; pointer-events: none;
+        animation: flyUp var(--duration) ease-out forwards;
+        filter: drop-shadow(0 3px 5px rgba(214,51,132,.2));
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .flying-heart { animation-duration: 1ms !important; }
+      }
+    `;
+    document.head.appendChild(flyingStyle);
+
+    function launchFlyingHearts() {
+      const emojis = ["💗", "💕", "💖", "💝", "✨", "🌸"];
+      for (let i = 0; i < 18; i++) {
+        const heart = document.createElement("span");
+        heart.className = "flying-heart";
+        heart.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        heart.style.left = `${Math.random() * 100}vw`;
+        heart.style.fontSize = `${18 + Math.random() * 22}px`;
+        heart.style.setProperty("--drift", `${Math.random() * 220 - 110}px`);
+        heart.style.setProperty("--spin", `${Math.random() * 100 - 50}deg`);
+        heart.style.setProperty("--duration", `${2.2 + Math.random() * 2.2}s`);
+        document.body.appendChild(heart);
+        heart.addEventListener("animationend", () => heart.remove(), { once: true });
+      }
+    }
+
+    function showRandomMessage(event) {
+      if (event) event.stopPropagation();
+
+      const message = heartMessages[Math.floor(Math.random() * heartMessages.length)];
+      let popup = document.getElementById("heart-message");
+
+      if (!popup) {
+        popup = document.createElement("div");
+        popup.id = "heart-message";
+        Object.assign(popup.style, {
+          position: "fixed",
+          left: "50%",
+          top: "12%",
+          transform: "translate(-50%, 0)",
+          zIndex: "9999",
+          maxWidth: "min(85vw, 420px)",
+          padding: "22px 28px",
+          borderRadius: "20px",
+          background: "rgba(255, 240, 247, 0.97)",
+          color: "#d63384",
+          boxShadow: "0 8px 30px rgba(214, 51, 132, 0.25)",
+          fontFamily: "Poppins, sans-serif",
+          fontSize: "18px",
+          fontWeight: "600",
+          textAlign: "center",
+          lineHeight: "1.6"
+        });
+        document.body.appendChild(popup);
+      }
+
+      popup.textContent = message;
+      popup.style.display = "block";
+      popup.style.animation = "none";
+      void popup.offsetWidth;
+      popup.style.animation = "messageFloatIn 450ms cubic-bezier(.2,.8,.2,1) both";
+      launchFlyingHearts();
+
+      const sound = document.getElementById("popsound");
+      if (sound) {
+        sound.currentTime = 0;
+        sound.play().catch(() => {});
+      }
+
+      clearTimeout(window.heartMessageTimeout);
+      window.heartMessageTimeout = setTimeout(() => {
+        popup.style.display = "none";
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
